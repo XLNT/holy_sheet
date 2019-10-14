@@ -1,0 +1,16 @@
+name: holy_sheet
+description: A Flutter sheet / panel that's good as hell.
+version: 0.0.1
+author: Matt Condon (shrugs) <matt@bydot.app>
+homepage:
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
