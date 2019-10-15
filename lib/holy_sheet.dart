@@ -1,8 +1,9 @@
 library holy_sheet;
 
+import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
-import 'package:harusaki/harusaki.dart';
 
+// a guesstimated ratio of relative velocity based on nothing in particular
 const double _minFlingVelocity = 1.5;
 
 /// From where does the sheet rise?
@@ -17,6 +18,7 @@ enum RiseFrom {
 class HolySheet extends StatefulWidget {
   const HolySheet({
     Key key,
+    @required this.description,
     @required this.riseFrom,
     @required this.animationController,
     this.animationBuilder,
@@ -28,12 +30,17 @@ class HolySheet extends StatefulWidget {
   /// Heaven = from the top and Hell = from the bottom
   final RiseFrom riseFrom;
 
+  /// A [SpringDescription] for animating transitions.
+  ///
+  /// See https://pub.dev/harusaki for conventional configurations.
+  final SpringDescription description;
+
   /// The animation controller that controls the bottom sheet's entrance and
   /// exit animations.
   ///
   /// The HolySheet will manipulate the position of this animation, it
   /// is not just a passive observer.
-  final HarusakiAnimationController animationController;
+  final AnimationController animationController;
 
   final TransitionBuilder animationBuilder;
 
@@ -45,21 +52,38 @@ class HolySheet extends StatefulWidget {
 }
 
 class _HolySheetState extends State<HolySheet> {
+  // a key with which to find the child widget
   final GlobalKey _childKey = GlobalKey(debugLabel: 'HolySheet child');
 
   // BouncingScrollPhysics exposes frictionFactor, so we'll keep things DRY
   final _scrollPhysics = BouncingScrollPhysics();
 
-  HarusakiAnimationController get _controller => widget.animationController;
+  // internal shortcut for referencing the animationController
+  AnimationController get _controller => widget.animationController;
 
+  // the height of the child widget
   double get _childHeight {
     final RenderBox renderBox = _childKey.currentContext.findRenderObject();
     return renderBox.size.height;
   }
 
+  // the frequently used sign for handling math inversions
   double get _sign => widget.riseFrom == RiseFrom.Heaven ? 1 : -1;
 
+  // animates a controller from current value to target with velocity
+  void _flingTo(double target, {double velocity = 0.0}) {
+    _controller.animateWith(
+      SpringSimulation(
+        widget.description,
+        _controller.value,
+        target,
+        velocity,
+      ),
+    );
+  }
+
   void _handleDragStart(DragStartDetails details) {
+    // interrupt existing animations
     _controller.stop(canceled: true);
   }
 
@@ -103,7 +127,7 @@ class _HolySheetState extends State<HolySheet> {
     }
 
     // if we're not flinging, let's settle somewhere
-    final controllerRange = _controller.suggestedUpperBound - _controller.suggestedLowerBound;
+    final controllerRange = _controller.upperBound - _controller.lowerBound;
     final isInUpperSegment = _controller.value >= (controllerRange * 0.5);
     final isInLowerSegment = !isInUpperSegment;
 
@@ -115,12 +139,12 @@ class _HolySheetState extends State<HolySheet> {
         : details.primaryVelocity.isNegative;
 
     if (isInUpperSegment) {
-      _controller.flingTo(_controller.suggestedUpperBound, velocity: _sign * velocity);
+      _flingTo(_controller.upperBound, velocity: _sign * velocity);
       return;
     }
 
     if (isInLowerSegment) {
-      _controller.flingTo(_controller.suggestedLowerBound, velocity: _sign * velocity);
+      _flingTo(_controller.lowerBound, velocity: _sign * velocity);
       return;
     }
 
@@ -129,12 +153,12 @@ class _HolySheetState extends State<HolySheet> {
     // and if not at all, we will use absolute positioning
     // and if perfectly centered, we'll default to closed because fuck you
     if (isMovingHigher) {
-      _controller.flingTo(_controller.suggestedUpperBound, velocity: _sign * velocity);
+      _flingTo(_controller.upperBound, velocity: _sign * velocity);
       return;
     }
 
     // the pointer is either not moving or moving to the lower bound
-    _controller.flingTo(_controller.suggestedLowerBound, velocity: _sign * velocity);
+    _flingTo(_controller.lowerBound, velocity: _sign * velocity);
     return;
   }
 
@@ -170,6 +194,7 @@ class _HolySheetState extends State<HolySheet> {
   }
 }
 
+/// The default layout animates the child from heaven or hell via offset.
 class _HolySheetLayout extends SingleChildLayoutDelegate {
   _HolySheetLayout(this.progress, this.sign);
 

@@ -35,8 +35,6 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     _controller = Harusaki.controller(
       Harusaki.normal,
       value: 1.0,
-      suggestedLowerBound: 0.0,
-      suggestedUpperBound: 1.0,
       vsync: this,
     );
     _opacity = Tween<double>(begin: 0, end: 1).animate(_controller);
@@ -45,11 +43,12 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   @override
   Widget build(BuildContext context) {
     final padding = MediaQuery.of(context).padding.top;
+    final headerHeight = padding + kToolbarHeight;
+    final contentHeight = MediaQuery.of(context).size.height - kToolbarHeight - headerHeight;
     final _height = Tween<double>(
-      begin: padding + kToolbarHeight,
-      end: MediaQuery.of(context).size.height,
+      begin: headerHeight,
+      end: headerHeight + contentHeight,
     );
-    final contentHeight = MediaQuery.of(context).size.height;
     return Stack(
       children: <Widget>[
         Container(
@@ -62,6 +61,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
           ),
         ),
         HolySheet(
+          description: Harusaki.normal,
           riseFrom: RiseFrom.Heaven,
           animationController: _controller,
           animationBuilder: (context, child) {
@@ -78,19 +78,22 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               color: Colors.purple,
               child: Column(
                 children: <Widget>[
-                  Container(color: Colors.red, height: 50),
-                  Container(color: Colors.blue, height: 50),
-                  Container(color: Colors.green, height: 50),
+                  Container(color: Colors.red, height: padding),
+                  Container(color: Colors.blue, height: kToolbarHeight),
                 ],
               ),
             );
 
-            return ClipRect(
-              child: OverflowBox(
-                alignment: Alignment.topCenter,
-                minHeight: contentHeight,
-                maxHeight: contentHeight,
-                child: child,
+            return Material(
+              elevation: 1,
+              color: Theme.of(context).bottomSheetTheme.backgroundColor,
+              child: ClipRect(
+                child: OverflowBox(
+                  minHeight: headerHeight,
+                  maxHeight: headerHeight + contentHeight,
+                  alignment: Alignment.topCenter,
+                  child: child,
+                ),
               ),
             );
           },

@@ -1,4 +1,4 @@
-package com.example.example
+package app.bydot.holysheet
 
 import android.os.Bundle
 

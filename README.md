@@ -2,6 +2,12 @@
 
 A Flutter sheet & panel widget that's good as hell.
 
+Use it to build something like:
+
+- Spotify's currently playing sheet
+- Material Bottom Sheet, but from the top of the screen
+- Apple's NFC / Apple Pay modals
+
 HolySheet respects the following conventions:
 
 1. The sheet is always modal.
