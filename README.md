@@ -1,14 +1,27 @@
 # holy_sheet
 
-A new Flutter package project.
+A Flutter sheet & panel widget that's good as hell.
 
-## Getting Started
+HolySheet respects the following conventions:
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
+1. The sheet is always modal.
+2. The sheet is always draggable.
+3. The sheet passes its constraints to its child, which it then sizes using a `FractionallySizedBox`.
+4. The sheet expects that all scrollable areas within itself respect the gesture arena and declare defeat when reasonable.
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+## Install
+
+```yml
+dependencies:
+  holy_sheet: ^0.0.1
+```
+
+## Usage
+
+```dart
+import 'package:holy_sheet/holy_sheet.dart';
+
+// ... somewhere in your widget tree
+
+
+```

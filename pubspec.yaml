@@ -1,13 +1,15 @@
 name: holy_sheet
-description: A Flutter sheet / panel that's good as hell.
+description: A Flutter sheet & panel widget that's good as hell.
 version: 0.0.1
 author: Matt Condon (shrugs) <matt@bydot.app>
-homepage:
+homepage: https://github.com/XLNT/holy_sheet
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  harusaki:
+    path: ../harusaki
   flutter:
     sdk: flutter
 
