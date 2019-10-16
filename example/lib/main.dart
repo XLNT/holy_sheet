@@ -49,21 +49,28 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       begin: headerHeight,
       end: headerHeight + contentHeight,
     );
+
     return Stack(
       children: <Widget>[
+        // the background
         Container(
           color: Colors.yellow,
         ),
+        // the darkening background
         FadeTransition(
           opacity: _opacity,
           child: Container(
             color: Colors.black45,
           ),
         ),
+        // the sheet layer
         HolySheet(
+          // use the `.normal` SpringDescription
           description: Harusaki.normal,
+          // descend from the top
           riseFrom: RiseFrom.Heaven,
           animationController: _controller,
+          // a custom animation for entrance/exit
           animationBuilder: (context, child) {
             return Align(
               alignment: Alignment.topCenter,
@@ -73,26 +80,30 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               ),
             );
           },
+          // the contents of the sheet
           builder: (context) {
-            final child = Container(
-              color: Colors.purple,
-              child: Column(
-                children: <Widget>[
-                  Container(color: Colors.red, height: padding),
-                  Container(color: Colors.blue, height: kToolbarHeight),
-                ],
-              ),
-            );
-
+            // a simple layout for showing the different layers
+            // it uses a Material as the primary background
             return Material(
               elevation: 1,
               color: Theme.of(context).bottomSheetTheme.backgroundColor,
+              // then clips the content within an overflow box
               child: ClipRect(
                 child: OverflowBox(
                   minHeight: headerHeight,
                   maxHeight: headerHeight + contentHeight,
                   alignment: Alignment.topCenter,
-                  child: child,
+                  // which is a purple back layer
+                  child: Container(
+                    color: Colors.purple,
+                    child: Column(
+                      // and some simple containers that illustrate the dimensions of the device
+                      children: <Widget>[
+                        Container(color: Colors.red, height: padding),
+                        Container(color: Colors.blue, height: kToolbarHeight),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             );
