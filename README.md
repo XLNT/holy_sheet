@@ -13,7 +13,7 @@ HolySheet respects the following conventions:
 
 1. The sheet is always modal.
 2. The sheet is always draggable.
-3. The sheet passes its constraints to its child, which it then sizes using a `FractionallySizedBox`.
+3. The sheet passes its constraints to its child, which it then (by default) translates with a custom layout.
 4. The sheet expects that all scrollable areas within itself respect the gesture arena and declare defeat when reasonable.
 
 ## TODO
