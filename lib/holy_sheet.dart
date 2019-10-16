@@ -20,6 +20,7 @@ class HolySheet extends StatefulWidget {
     Key key,
     @required this.description,
     @required this.riseFrom,
+    this.travelDistance,
     @required this.animationController,
     this.animationBuilder,
     @required this.builder,
@@ -34,6 +35,10 @@ class HolySheet extends StatefulWidget {
   ///
   /// See https://pub.dev/harusaki for conventional configurations.
   final SpringDescription description;
+
+  /// The distance the pointer will travel when expanded/collapsing the sheet,
+  /// only necessary if travelDistance != childHeight
+  final double travelDistance;
 
   /// The animation controller that controls the bottom sheet's entrance and
   /// exit animations.
@@ -107,11 +112,19 @@ class _HolySheetState extends State<HolySheet> {
     final friction =
         overscrollFraction > 0 ? _scrollPhysics.frictionFactor(overscrollFraction) : 1.0;
 
-    // the height of the child (default to the amount dragged to cancel out the divisin)
-    final height = _childHeight ?? details.primaryDelta;
+    // the height of the child (default to the amount dragged to cancel out the division)
+    final _travelDistance = widget.travelDistance ?? _childHeight ?? details.primaryDelta;
+
+    // the absolute amount to change the value of the animation controller
+    // (assumes [0, 1] AnimationController bounds)
+    // linearly interpolating between amount dragged and how much drag needs to happen
+    final percentChange = details.primaryDelta / _travelDistance;
+
+    // friction will be any number [0, 1] and it exponentially slows your dragging
+    final percentChangeWithFriction = percentChange * friction;
 
     // set the controller value to the amount dragged
-    _controller.value += _sign * (details.primaryDelta / height * friction);
+    _controller.value += _sign * percentChangeWithFriction;
   }
 
   void _handleDragEnd(DragEndDetails details) {
