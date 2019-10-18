@@ -72,6 +72,9 @@ class _HolySheetState extends State<HolySheet> {
     return renderBox.size.height;
   }
 
+  // how far the panel is traveling, for calculating relative units
+  double get _travelDistance => widget.travelDistance ?? _childHeight;
+
   // the frequently used sign for handling math inversions
   double get _sign => widget.riseFrom == RiseFrom.Heaven ? 1 : -1;
 
@@ -112,13 +115,10 @@ class _HolySheetState extends State<HolySheet> {
     final friction =
         overscrollFraction > 0 ? _scrollPhysics.frictionFactor(overscrollFraction) : 1.0;
 
-    // the height of the child (default to the amount dragged to cancel out the division)
-    final _travelDistance = widget.travelDistance ?? _childHeight ?? details.primaryDelta;
-
     // the absolute amount to change the value of the animation controller
     // (assumes [0, 1] AnimationController bounds)
     // linearly interpolating between amount dragged and how much drag needs to happen
-    final percentChange = details.primaryDelta / _travelDistance;
+    final percentChange = details.primaryDelta / (_travelDistance ?? details.primaryDelta);
 
     // friction will be any number [0, 1] and it exponentially slows your dragging
     final percentChangeWithFriction = percentChange * friction;
@@ -129,7 +129,7 @@ class _HolySheetState extends State<HolySheet> {
 
   void _handleDragEnd(DragEndDetails details) {
     // compute the _relative_ velocity
-    final velocity = details.primaryVelocity / _childHeight;
+    final velocity = details.primaryVelocity / (_travelDistance ?? 1.0);
 
     // are we flinging the sheet in a specific direction?
     final flinging = velocity.abs() > _minFlingVelocity;
